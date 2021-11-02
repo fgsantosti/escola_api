@@ -8,7 +8,7 @@ O foco aqui é o desenvolvimento de web API's de forma simples e ágil. Segundo 
 
 ```python
 mkdir escola_api
-cd escola_escola_api
+cd escola_api
 ```
 
 
