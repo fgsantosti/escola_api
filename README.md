@@ -163,9 +163,10 @@ python manage.py startapp escola
 """### Realizando a instalação das app's criadas
 
 Depois de criar uma aplicação, também precisamos dizer ao Django que ele deve usá-la. Fazemos isso no arquivo ```setup/settings.py ``` -- abra-o no seu editor de código. Precisamos encontrar o INSTALLED_APPS e adicionar uma linha com 'livraria', logo acima do ].
-"""
+
 
 # Application definition
+```python
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -176,6 +177,9 @@ INSTALLED_APPS = [
     'rest_framework', #framework
     'escola', #app
 ]
+```
+
+"""
 
 """### Criando os modelos para nossa escola
 
@@ -185,8 +189,8 @@ Vamos abrir ```escola/models.py``` no editor de código, apagar tudo dele e escr
 
 
 
-"""
 
+```python
 from django.db import models
 
 # Create your models here.
@@ -210,6 +214,8 @@ class Curso(models.Model):
 
     def __str__(self):
         return self.descricao
+```
+"""
 
 """### Criando tabelas para nossos modelos no banco de dados
 
@@ -244,8 +250,9 @@ Quando for solicitado, insira seu nome de usuário (letras minúsculas, sem espa
 
 Depois disso, volte ao seu navegador. Faça login com as credenciais de superusuário que você escolheu; você deverá ver o painel de controle de administração do Django.
 
-Logo depois, configure o seu arquivo `escola/admin.py`"""
+Logo depois, configure o seu arquivo `escola/admin.py`
 
+```python
 from django.contrib import admin
 from escola.models import Aluno, Curso
 
@@ -265,6 +272,10 @@ class Cursos(admin.ModelAdmin):
     list_per_page = 20
 
 admin.site.register(Cursos, Curso)
+
+```python
+
+"""
 
 """Vamos startar o servidor web 
 
