@@ -1,5 +1,4 @@
 
-
 # API com Django: Django Rest Framework
 
 O foco aqui é o desenvolvimento de web API's de forma simples e ágil. Segundo a documentação oficial, o Django Rest gera uma API navegável que auxilia na usabilidade para os desenvolvedores. Além disso, possui um sistema de autenticação e serialização dos dados.
@@ -100,11 +99,11 @@ Foi instalado inicialmente:
 ## Criando o projeto Django Escola Api
 
 Depois de criaremos a pasta seguiremos alguns passos classícos do Django. Dentro da pasta executaremos o seguinte comando:
-"""
+
 
 django-admin startproject setup .
 
-"""`django-admin` é um script que criará os diretórios e arquivos para você. 
+`django-admin` é um script que criará os diretórios e arquivos para você. 
 
 manage.py é um script que ajuda com a gestão do site. Com ele, podemos iniciar um servidor de web no nosso computador sem instalar nada, entre outras coisas.
 
@@ -115,12 +114,12 @@ O arquivo `urls.py` contém uma lista dos padrões usados por urlresolver.
 ### Mudando as configurações
 
 Para finalizar a configuração do ambiente, na pasta setup, altere no arquivo settings.py o idioma e o horário que usaremos na aplicação, incluindo as seguintes linhas de código:
-"""
+
 
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 
-"""### Instalando o Django Rest Framework
+### Instalando o Django Rest Framework
 
 A estrutura Django REST é um kit de ferramentas poderoso e flexível para a construção de APIs da Web. Alguns motivos pelos quais você pode querer usar a estrutura REST: 
 
@@ -130,13 +129,13 @@ A estrutura Django REST é um kit de ferramentas poderoso e flexível para a con
 - Usado e confiado por empresas internacionalmente reconhecidas, incluindo Mozilla, Red Hat, Heroku e Eventbrite.
 
 Ref. https://www.django-rest-framework.org/
-"""
+
 
 pip install djangorestframework
 pip install markdown       # Markdown support for the browsable API.
 pip install django-filter  # Filtering support
 
-"""Iremos fazer o sistema de uma livraria:
+Iremos fazer o sistema de uma livraria:
 
 
 https://lucid.app/lucidchart/invitations/accept/inv_5eed4c07-9e9e-43a9-b319-fb69ce832c6c
@@ -150,11 +149,11 @@ https://github.com/fgsantosti/django_livraria
 Para manter tudo arrumado, vamos criar uma aplicação separada dentro do nosso projeto. É muito bom ter tudo organizado desde o início.
 
 Vamos criar a aplicação escola com o comando:
-"""
+
 
 python manage.py startapp escola
 
-"""### Realizando a instalação das app's criadas
+### Realizando a instalação das app's criadas
 
 Depois de criar uma aplicação, também precisamos dizer ao Django que ele deve usá-la. Fazemos isso no arquivo ```setup/settings.py ``` -- abra-o no seu editor de código. Precisamos encontrar o INSTALLED_APPS e adicionar uma linha com 'livraria', logo acima do ].
 
@@ -173,9 +172,9 @@ INSTALLED_APPS = [
 ]
 ```
 
-"""
 
-"""### Criando os modelos para nossa escola
+
+### Criando os modelos para nossa escola
 
 No arquivo ```escola/models.py``` definimos todos os objetos chamados Modelos -- este é um lugar em que vamos definir os relacionamentos entre as classes que estaram presentes na nossa livraria defindos no nosso diagrama e classes.
 
@@ -209,9 +208,9 @@ class Curso(models.Model):
     def __str__(self):
         return self.descricao
 ```
-"""
 
-"""### Criando tabelas para nossos modelos no banco de dados
+
+### Criando tabelas para nossos modelos no banco de dados
 
 O último passo é adicionar nosso novo modelo ao banco de dados. Primeiramente, precisamos fazer com que o Django entenda que fizemos algumas alterações nos nossos modelos.
 
@@ -235,11 +234,11 @@ Para fazermos as operações de
 * Deletar 
 
 Nas tabelas Curso e Aluno que modelamos iremos inicialmente usar o admin do Django. Vamos abrir o arquivo `escola/admin.py`no editor de código e acrescentamos os códigos seguintes.
-"""
+
 
 python manage.py createsuperuser
 
-"""
+
 Quando for solicitado, insira seu nome de usuário (letras minúsculas, sem espaços), e-mail e senha. **Não se preocupe por não conseguir ver a senha que está digitando - é assim mesmo**. Digite a senha e aperte a tecla enter para continuar. 
 
 Depois disso, volte ao seu navegador. Faça login com as credenciais de superusuário que você escolheu; você deverá ver o painel de controle de administração do Django.
@@ -269,9 +268,9 @@ admin.site.register(Cursos, Curso)
 
 ```python
 
-"""
 
-"""Vamos startar o servidor web 
+
+Vamos startar o servidor web 
 
 
 ```python
