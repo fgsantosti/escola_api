@@ -270,7 +270,7 @@ class Cursos(admin.ModelAdmin):
 
 admin.site.register(Cursos, Curso)
 
-```python
+```
 
 
 
