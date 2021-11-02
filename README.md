@@ -186,7 +186,6 @@ Vamos abrir ```escola/models.py``` no editor de código, apagar tudo dele e escr
 
 
 
-
 ```python
 from django.db import models
 
@@ -211,6 +210,18 @@ class Curso(models.Model):
 
     def __str__(self):
         return self.descricao
+
+class Matricula(models.Model):
+    PERIODO = (
+        ('M', 'Matutino'),
+        ('V', 'Vespertino'),
+        ('N', 'Noturno')) 
+    aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE)
+    curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
+    periodo = models.CharField(max_length=1, choices=PERIODO, blank=False, null=False, default='M')
+
+    def __str__(self):
+        return self.periodo
 ```
 
 
@@ -251,27 +262,33 @@ Logo depois, configure o seu arquivo `escola/admin.py`
 
 ```python
 from django.contrib import admin
-from escola.models import Aluno, Curso
+from escola.models import Aluno, Curso, Matricula
 
 # Register your models here.
 class Alunos(admin.ModelAdmin):
     list_display = ('id', 'nome', 'rg', 'cpf', 'data_nascimento')
     list_display_links = ('id', 'nome')
-    search_fields = ('nome')
+    search_fields = ('nome',)
     list_per_page = 20
 
-admin.site.register(Alunos, Aluno)
+admin.site.register(Aluno, Alunos)
 
 class Cursos(admin.ModelAdmin):
     list_display = ('id', 'codigo_curso', 'descricao')
     list_display_links = ('id', 'codigo_curso')
-    search_fields = ('codigo_curso')
+    search_fields = ('codigo_curso',)
     list_per_page = 20
 
-admin.site.register(Cursos, Curso)
+admin.site.register(Curso, Cursos)
+
+class Matriculas(admin.ModelAdmin):
+    list_display = ('id', 'aluno', 'curso')
+    list_display_links = ('id',)
+    list_per_page = 20
+
+admin.site.register(Matricula, Matriculas)
 
 ```
-
 
 
 Vamos startar o servidor web 
@@ -288,4 +305,167 @@ Vamos acessar a área do administrador do sistema que já vem prontinho para gen
 http://127.0.0.1:8000/admin/
 ```
 
+
+## Serialização 
+
+A estrutura de serialização do Django fornece um mecanismo para “traduzir” os modelos Django para outros formatos. 
+Normalmente, esses outros formatos serão baseados em texto e usados para enviar dados do Django por uma conexão, 
+mas é possível para um serializador lidar com qualquer formato (baseado em texto ou não). Ref. https://docs.djangoproject.com/en/3.2/topics/serialization/
+
+
+A primeira coisa que precisamos para começar nossa API da Web é fornecer uma maneira de serializar e desserializar 
+s instâncias de snippet em representações como json. Podemos fazer isso declarando serializadores que funcionam de 
+forma muito semelhante aos formulários do Django. Crie um arquivo no diretório de escola denominado serializers.py 
+(`escola/serializer.py`) e adicione o seguinte código. 
+
+```python
+from django.db import models
+from django.db.models import fields
+from rest_framework import serializers
+from escola.models import Aluno, Curso, Matricula
+
+class AlunoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Aluno
+        fields = ['id', 'nome', 'rg', 'cpf', 'data_nascimento']
+
+
+class CursoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Curso
+        fields = '__all__'
+
+
+class MatriculaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Matricula
+        exclude = []
+
+
+class ListaMatriculaAlunoSerializer(serializers.ModelSerializer):
+    curso = serializers.ReadOnlyField(source='curso.descricao')
+    periodo = serializers.SerializerMethodField()
+    class Meta:
+        model = Matricula
+        fields = ['curso', 'periodo']
+    
+    def get_periodo(self, obj):
+        return obj.get_periodo_display()
+
+
+class ListaAlunosMatriculadosSerializer(serializers.ModelSerializer):
+    aluno_nome = serializers.ReadOnlyField(source='aluno.nome')
+    class Meta:
+        model = Matricula
+        fields = ['aluno_nome',]
+
+```
+
+## Views - Escrevendo visualizações regulares do Django usando nosso Serializer
+
+Vamos ver como podemos escrever algumas visualizações de API usando nossa nova classe Serializer. 
+Por enquanto, não usaremos nenhum dos outros recursos do framework REST, apenas escreveremos as visualizações como 
+visualizações regulares do Django. Edite o arquivo escola/views.py e adicione o seguinte:
+
+```python
+from django.db.models.query import QuerySet
+from rest_framework import permissions
+from escola.admin import Alunos
+from django.shortcuts import render
+
+from rest_framework import serializers, viewsets, generics
+from escola.models import Aluno, Curso, Matricula
+from escola.serializer import AlunoSerializer, CursoSerializer, ListaAlunosMatriculadosSerializer, MatriculaSerializer, ListaMatriculaAlunoSerializer
+from rest_framework.authentication import BaseAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+
+class AlunoViewSet(viewsets.ModelViewSet):
+    """Exibindo todos os alunos"""
+    queryset = Aluno.objects.all()
+    serializer_class = AlunoSerializer
+    authentication_classes = [BaseAuthentication]
+    permission_classes = [IsAuthenticated]
+
+class CursoViewSet(viewsets.ModelViewSet):
+    """Exibindo todos os cursos"""
+    queryset = Curso.objects.all()
+    serializer_class = CursoSerializer
+    authentication_classes = [BaseAuthentication]
+    permission_classes = [IsAuthenticated]
+
+class MatriculaViewSet(viewsets.ModelViewSet):
+    """Exibindo todos as matriculas"""
+    queryset = Matricula.objects.all() 
+    serializer_class = MatriculaSerializer
+    authentication_classes = [BaseAuthentication]
+    permission_classes = [IsAuthenticated]
+
+
+class ListaMatriculasAluno(generics.ListAPIView):
+    """Exibindo todas as matriculas do aluno"""
+    def get_queryset(self):
+        queryset = Matricula.objects.filter(aluno_id=self.kwargs['pk']) 
+        return queryset
+    
+    serializer_class = ListaMatriculaAlunoSerializer
+    authentication_classes = [BaseAuthentication]
+    permission_classes = [IsAuthenticated]
+
+class ListaAlunosMatriculaCurso(generics.ListAPIView):
+    """Exibindo todos os alunos matriculados por curso"""
+    def get_queryset(self):
+        queryset = Matricula.objects.filter(curso_id=self.kwargs['pk'])
+        return queryset
+    
+    serializer_class = ListaAlunosMatriculadosSerializer
+    authentication_classes = [BaseAuthentication]
+    permission_classes = [IsAuthenticated]
+```
+
+
+## Urls - Precisamos conectar essas visualizações
+
+### Suas URLs no Django REST!
+É hora de criar nossa primeira URL! 
+
+Queremos que http://127.0.0.1:8000/ seja a página inicial da nossa escola API e exiba uma as urls que configuramos anteriormente.
+
+
+Abra o arquivo `escola_api/setup/urls.py` no seu editor de código preferido e veja o que aparece:
+
+
+```python
+from django.contrib import admin
+from django.urls import path, include
+from rest_framework import routers
+from escola.views import AlunoViewSet, CursoViewSet, MatriculaViewSet, ListaMatriculasAluno, ListaAlunosMatriculaCurso
+
+
+router = routers.DefaultRouter()
+router.register('alunos', AlunoViewSet, basename='Alunos')
+router.register('cursos', CursoViewSet, basename='Cursos')
+router.register('matriculas', MatriculaViewSet, basename='Matriculas')
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('',include(router.urls)),
+    path('aluno/<int:pk>/matriculas/', ListaMatriculasAluno.as_view()),
+    path('curso/<int:pk>/matriculas/', ListaAlunosMatriculaCurso.as_view())
+]
+
+```
+
+
+Vamos startar o servidor web 
+
+
+```python
+python manage.py runserver #startando o servidor
+```
+
+
+```python
+http://127.0.0.1:8000/
+```
+E você irá vizualizar a página de API Root da nossa escola API. 
 
