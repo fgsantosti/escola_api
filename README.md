@@ -100,8 +100,9 @@ Foi instalado inicialmente:
 
 Depois de criaremos a pasta seguiremos alguns passos classícos do Django. Dentro da pasta executaremos o seguinte comando:
 
-
+```python
 django-admin startproject setup .
+```
 
 `django-admin` é um script que criará os diretórios e arquivos para você. 
 
@@ -115,9 +116,10 @@ O arquivo `urls.py` contém uma lista dos padrões usados por urlresolver.
 
 Para finalizar a configuração do ambiente, na pasta setup, altere no arquivo settings.py o idioma e o horário que usaremos na aplicação, incluindo as seguintes linhas de código:
 
-
+```python
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
+```
 
 ### Instalando o Django Rest Framework
 
@@ -130,13 +132,13 @@ A estrutura Django REST é um kit de ferramentas poderoso e flexível para a con
 
 Ref. https://www.django-rest-framework.org/
 
-
+```python
 pip install djangorestframework
 pip install markdown       # Markdown support for the browsable API.
 pip install django-filter  # Filtering support
+```
 
 Iremos fazer o sistema de uma livraria:
-
 
 https://lucid.app/lucidchart/invitations/accept/inv_5eed4c07-9e9e-43a9-b319-fb69ce832c6c
 
@@ -144,14 +146,16 @@ Vamos seguir o projeto:
 
 https://github.com/fgsantosti/django_livraria
 
+
 ### Criando uma aplicação
 
 Para manter tudo arrumado, vamos criar uma aplicação separada dentro do nosso projeto. É muito bom ter tudo organizado desde o início.
 
 Vamos criar a aplicação escola com o comando:
 
-
+```python
 python manage.py startapp escola
+```
 
 ### Realizando a instalação das app's criadas
 
@@ -235,9 +239,9 @@ Para fazermos as operações de
 
 Nas tabelas Curso e Aluno que modelamos iremos inicialmente usar o admin do Django. Vamos abrir o arquivo `escola/admin.py`no editor de código e acrescentamos os códigos seguintes.
 
-
+```python
 python manage.py createsuperuser
-
+```
 
 Quando for solicitado, insira seu nome de usuário (letras minúsculas, sem espaços), e-mail e senha. **Não se preocupe por não conseguir ver a senha que está digitando - é assim mesmo**. Digite a senha e aperte a tecla enter para continuar. 
 
@@ -284,4 +288,4 @@ Vamos acessar a área do administrador do sistema que já vem prontinho para gen
 http://127.0.0.1:8000/admin/
 ```
 
-"""
+
